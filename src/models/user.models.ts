@@ -1,5 +1,5 @@
 import {Schema,model} from "mongoose";
-import { Gender } from "../types/enum.types";
+import { Gender, Role } from "../types/enum.types";
 
 const useSchema = new Schema({
     firstName:{
@@ -21,7 +21,12 @@ const useSchema = new Schema({
     password:{
         type:String,
         requred:[true,'[password is required'],
-        min:6
+        minlength:6
+    },
+    role:{
+        type:String,
+        enum:Object.values(Role),
+        default:Role.USER
     },
     phone:{
         type:String

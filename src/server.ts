@@ -1,6 +1,11 @@
 import express, { urlencoded } from 'express'
 import { connectDatabase } from './config/database.config'
 
+
+//importing routes
+import authRoutes from './routes/auth.routes'
+
+
 const PORT = 8080
 const DB_URI = 'mongodb://127.0.0.1:27017/travel_management'
 const app = express()
@@ -21,6 +26,9 @@ app.get('/',(req,res)=>{
     })
 })
 
+
+//using routes
+app.use('/api/auth',authRoutes)
 
 
 app.listen(PORT,()=>{
