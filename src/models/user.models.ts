@@ -20,7 +20,7 @@ const useSchema = new Schema({
     },
     password:{
         type:String,
-        requred:[true,'[password is required'],
+        required:[true,'[password is required'],
         minlength:6
     },
     role:{
