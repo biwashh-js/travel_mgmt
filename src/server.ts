@@ -1,6 +1,6 @@
 import express, { urlencoded } from 'express'
 import { connectDatabase } from './config/database.config'
-
+import customError, {errorHandler} from './middlewares/err.handler.middleware'
 
 //importing routes
 import authRoutes from './routes/auth.routes'
@@ -32,7 +32,14 @@ app.get('/',(req,res)=>{
 app.use('/api/auth',authRoutes)
 app.use('/api/user',userRoutes)
 
+app.all('{*spalt}',(req, res, next) => {
+    const message = `cannot ${req.method} on ${req.url}`
+    const error = new customError(message,404)
+    next(error)
+})
 
 app.listen(PORT,()=>{
     console.log(`server is running at http://localhost:${PORT}`)
 })
+
+app.use(errorHandler)
