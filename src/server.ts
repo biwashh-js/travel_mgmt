@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express, { urlencoded } from 'express'
 import { connectDatabase } from './config/database.config'
 import customError, {errorHandler} from './middlewares/err.handler.middleware'
@@ -7,8 +8,9 @@ import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
 
 
-const PORT = 8080
-const DB_URI = 'mongodb://127.0.0.1:27017/travel_management'
+const PORT = process.env.PORT || 8080
+const DB_URI = process.env.DB_URI || 'mongodb://127.0.0.1:27017/travel_management'
+console.log(PORT,DB_URI)
 const app = express()
 
 //connect database
