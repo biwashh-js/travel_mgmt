@@ -3,8 +3,7 @@ import User from "../models/user.models"
 import { hash } from "bcryptjs"
 import { comparePassword, hashPassword } from "../utils/bcrypt.utils"
 import bcrypt from 'bcryptjs'
-import CustomError from "../middlewares/err.handler.middleware"
-import customError from "../middlewares/err.handler.middleware"
+import customError from "../middlewares/error-handler.middleware"
 
 
 export const register = async(req:Request, res:Response, next:NextFunction) => {
@@ -13,7 +12,7 @@ export const register = async(req:Request, res:Response, next:NextFunction) => {
         const {firstName,lastName,email,password,phone,gender} = req.body
 
         if(!password){
-            throw new CustomError('password is required',404)
+            throw new customError('password is required',404)
         }
 
         const user = new User({
@@ -37,13 +36,7 @@ export const register = async(req:Request, res:Response, next:NextFunction) => {
         })
 
     }catch(error:any){
-        res.status(500).json({
-            message:error?.message ?? 'internal server error',
-            success: false,
-            status: 'fail',
-            data : null
-        })
-
+        next(error)
     }
 }
 
@@ -53,16 +46,16 @@ export const login = async (req: Request, res: Response, next:NextFunction) => {
     try {
         const { email, password } = req.body;
         if(!email){
-            throw new CustomError('email is required',404)
+            throw new customError('email is required',404)
         }
         if(!password){
-            throw new CustomError('password is required',404)
+            throw new customError('password is required',404)
         }
 
         const user:any= await User.findOne({ email });
 
         if (!user) {
-            throw new CustomError('credentials does not match ',400)
+            throw new customError('credentials does not match ',400)
             }
 
         const {password:userPass,...userData} = user?._doc
@@ -82,11 +75,6 @@ export const login = async (req: Request, res: Response, next:NextFunction) => {
         })
         }
         catch (error: any) {
-        res.status(500).json({
-            message: error?.message ?? 'Internal server error',
-            success: false,
-            status: 'fail',
-            data: null
-        });
+       next(error)
     }
 }

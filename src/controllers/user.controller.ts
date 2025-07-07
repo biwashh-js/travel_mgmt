@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response } from "express"
 import User from "../models/user.models"
-import CustomError from "../middlewares/err.handler.middleware"
+import customError from "../middlewares/error-handler.middleware"
 
 
 //get all user
@@ -17,11 +17,7 @@ export const getAllUser = async(req:Request, res: Response, next:NextFunction)=>
         })
     }
     catch(error:any){
-        res.status(500).json({
-            message:error?.message ?? 'something went wrong',
-            success: false,
-            status: 'error',
-        })
+      next(error)
     }
 }
 
@@ -35,7 +31,7 @@ export const getById = async(req:Request, res:Response, next:NextFunction) =>{
         
         const user:any = await User.findById(userId).select("-password")
         if(!user){
-            throw new CustomError("user not found",404)
+            throw new customError("user not found",404)
         }
 
         res.status(200).json({
@@ -46,11 +42,7 @@ export const getById = async(req:Request, res:Response, next:NextFunction) =>{
         })
     }
     catch(error:any){
-        res.status(500).json({
-            message:error?.message ?? 'internal server error',
-            status:'fail',
-            success:false,
-        })
+     next(error)
     }
 }
 
@@ -64,7 +56,7 @@ export const updateProfile = async(req:Request, res:Response, next:NextFunction)
         const user = await User.findByIdAndUpdate(userId,req.body,{new:true})
 
       if(!user){
-            throw new CustomError("user not found",404);
+            throw new customError("user not found",404);
         }
     
     
@@ -74,11 +66,6 @@ export const updateProfile = async(req:Request, res:Response, next:NextFunction)
     })
     }
     catch(error:any){
-        res.status(500).json({
-            message:error?.message ?? 'internal server error',
-            status:'fail',
-            success:false,
-            data:null
-        })
+        next(error)
     }
 }
