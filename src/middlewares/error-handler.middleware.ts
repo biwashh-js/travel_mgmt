@@ -2,11 +2,13 @@ import { Request, Response, NextFunction } from "express";
 
 class customError extends Error {
   statusCode: number;
-  status: string;
+  status: 'success' | 'fail' | 'error';
   success: boolean;
+  isOperational:boolean;
 
   constructor(message: string, statusCode: number) {
     super(message);
+    this.isOperational = true ;
     this.statusCode = statusCode;
     this.status = statusCode >= 400 && statusCode < 500 ? "fail" : "error";
     this.success = false;

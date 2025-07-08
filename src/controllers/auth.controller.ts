@@ -46,10 +46,10 @@ export const login = async (req: Request, res: Response, next:NextFunction) => {
     try {
         const { email, password } = req.body;
         if(!email){
-            throw new customError('email is required',404)
+            throw new customError('email is required',400)
         }
         if(!password){
-            throw new customError('password is required',404)
+            throw new customError('password is required',400)
         }
 
         const user:any= await User.findOne({ email });
