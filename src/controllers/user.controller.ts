@@ -1,12 +1,15 @@
-import {NextFunction, Request, Response } from "express"
+import {NextFunction, Request, RequestHandler, Response } from "express"
 import User from "../models/user.models"
 import customError from "../middlewares/error-handler.middleware"
+import { asyncHandler } from "../utils/async-handler.utils"
+
 
 
 //get all user
 
-export const getAllUser = async(req:Request, res: Response, next:NextFunction)=> {
-    try{
+export const getAllUser = asyncHandler(
+    async(req:Request, res: Response, next:NextFunction)=> {
+   
         const users:any = await User.find().select("-password")
 
         res.status(200).json({
@@ -15,57 +18,74 @@ export const getAllUser = async(req:Request, res: Response, next:NextFunction)=>
             success:true,
             data:users
         })
-    }
-    catch(error:any){
-      next(error)
-    }
-}
 
+})
 
 
 //get by id
 
-export const getById = async(req:Request, res:Response, next:NextFunction) =>{
-    try{
-        const {userId} = req.params
+export const getById = asyncHandler(async(req:Request, res:Response, next:NextFunction) =>{
+const {userId} = req.params
         
         const user:any = await User.findById(userId).select("-password")
         if(!user){
             throw new customError("user not found",404)
         }
-
         res.status(200).json({
             message:`user fetched`,
             status:"success",
             success:true,
             data:user
         })
-    }
-    catch(error:any){
-     next(error)
-    }
-}
+
+})
 
 
-
-export const updateProfile = async(req:Request, res:Response, next:NextFunction) =>{
-    try{
-        const {userId} = req.params
-        const query = req.query
-
-        const user = await User.findByIdAndUpdate(userId,req.body,{new:true})
+//update profile
+export const updateProfile =asyncHandler(  async(req:Request, res:Response, next:NextFunction) =>{
+      const {firstName,lastName,phone,gender} = req.body
+      const {userId} = req.params
+      const user = await User.findById(userId)
 
       if(!user){
             throw new customError("user not found",404);
         }
     
+    if(firstName) user.firstName = firstName
+    if(lastName) user.lastName = lastName
+    if(phone) user.phone = phone
+    if(gender) user.gender = gender
     
+    await user.save()
+
+    // OR findByIdAndUpdate ({id},{firstName,lastName,phone,gender},{new:true})
+
     res.status(200).json({
-        message:`user updated`,
+        message:`profile updated successully`,
+        success: true,
+        status:'success',
         data:user
     })
-    }
-    catch(error:any){
-        next(error)
-    }
-}
+  
+})
+
+
+//delete user
+
+export const deleteUser = asyncHandler(async(req:Request,res:Response,next:NextFunction) => {
+        const {userId} = req.params
+         const deleteUser = await User.findByIdAndDelete(userId)
+
+      if(!deleteUser){
+            throw new customError("user not found",404);
+        }
+    
+    
+    res.status(200).json({
+        message:`user deleted sucessfully`,
+        success:true,
+        status:'success',
+        data:null
+    })
+
+})

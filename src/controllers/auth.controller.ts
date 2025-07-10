@@ -4,11 +4,10 @@ import { hash } from "bcryptjs"
 import { comparePassword, hashPassword } from "../utils/bcrypt.utils"
 import bcrypt from 'bcryptjs'
 import customError from "../middlewares/error-handler.middleware"
+import { asyncHandler } from "../utils/async-handler.utils"
 
 
-export const register = async(req:Request, res:Response, next:NextFunction) => {
-    try{
-
+export const register = asyncHandler(async(req:Request, res:Response, next:NextFunction) => {
         const {firstName,lastName,email,password,phone,gender} = req.body
 
         if(!password){
@@ -35,15 +34,13 @@ export const register = async(req:Request, res:Response, next:NextFunction) => {
             data: user
         })
 
-    }catch(error:any){
-        next(error)
-    }
+  
 }
+)
 
 
-
-export const login = async (req: Request, res: Response, next:NextFunction) => {
-    try {
+export const login =asyncHandler( async (req: Request, res: Response, next:NextFunction) => {
+    
         const { email, password } = req.body;
         if(!email){
             throw new customError('email is required',400)
@@ -73,8 +70,5 @@ export const login = async (req: Request, res: Response, next:NextFunction) => {
             success:true,
             data:userData
         })
-        }
-        catch (error: any) {
-       next(error)
-    }
 }
+)

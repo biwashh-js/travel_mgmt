@@ -6,6 +6,7 @@ import customError, {errorHandler} from './middlewares/error-handler.middleware'
 //importing routes
 import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
+import adminRoutes from './routes/admin.routes'
 
 
 const PORT = process.env.PORT || 8080
@@ -33,6 +34,7 @@ app.get('/',(req,res)=>{
 //using routes
 app.use('/api/auth',authRoutes)
 app.use('/api/user',userRoutes)
+app.use('/api/admin',adminRoutes)
 
 // fallback routing
 app.all('{*spalt}',(req:Request, res:Response, next:NextFunction) => {
