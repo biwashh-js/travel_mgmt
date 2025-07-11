@@ -9,3 +9,9 @@ export enum Role{
     SUPER_ADMIN = 'SUPER_ADMIN',
     ADMIN = 'ADMIN'
 }
+
+
+export enum Package_Charge {
+    PER_DAY = 'PER_DAY',
+    PER_PERSON = 'PER_PERSON'
+}

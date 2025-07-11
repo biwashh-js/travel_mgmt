@@ -6,12 +6,11 @@ import customError, {errorHandler} from './middlewares/error-handler.middleware'
 //importing routes
 import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
-import adminRoutes from './routes/admin.routes'
+import packageRoutes from './routes/tour_packages.routes'
 
 
 const PORT = process.env.PORT || 8080
 const DB_URI = process.env.DB_URI ?? ''
-console.log(PORT,DB_URI)
 const app = express()
 
 //connect database
@@ -34,7 +33,7 @@ app.get('/',(req,res)=>{
 //using routes
 app.use('/api/auth',authRoutes)
 app.use('/api/user',userRoutes)
-app.use('/api/admin',adminRoutes)
+app.use('api/tour_package',)
 
 // fallback routing
 app.all('{*spalt}',(req:Request, res:Response, next:NextFunction) => {
