@@ -7,7 +7,7 @@ const packageSchema = new Schema({
         required:[true,'title is required'],
         trim:true
     },
-    plans:[
+    destinations:[
         {
             location:{
                 type:String,
@@ -16,7 +16,7 @@ const packageSchema = new Schema({
             },
             description:{
                 type:String,
-                required:true
+                required:false
             }
         }
     ],
