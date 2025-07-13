@@ -31,6 +31,35 @@ export const create = asyncHandler(async(req:Request,res:Response,next:NextFunct
     })
 })
 
+export const getAll = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const tour_packages = await Tour_Package.find({})
+      res.status(200).json({
+            message:'packages fetched successfully.',
+            status:'success',
+            success:true,
+            data:tour_packages
+        })
+})
+
+
+
+
+export const getById = asyncHandler(async(req:Request, res:Response, next:NextFunction) =>{
+const {packageId} = req.params
+        
+        const tour_package = await Tour_Package.findById(packageId)
+        if(!tour_package){
+            throw new customError("package not found",404)
+        }
+        res.status(200).json({
+            message:`package fetched`,
+            status:"success",
+            success:true,
+            data:tour_package
+        })
+
+})
+
 
 export const deletePackage = asyncHandler(async(req:Request,res:Response,next:NextFunction) => {
         const {packageId} = req.params
@@ -50,12 +79,13 @@ export const deletePackage = asyncHandler(async(req:Request,res:Response,next:Ne
 
 })
 
+
 export const updatePackage = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const{title,destinations,start_date,end_date,seats_available,total_charge,cost_type,description} = req.body
     const {packageId} = req.params
     const tour_package = await Tour_Package.findById(packageId)
     if(!tour_package){
-        throw new customError('package not founf',404)
+        throw new customError('package not found',404)
 
     }
 
