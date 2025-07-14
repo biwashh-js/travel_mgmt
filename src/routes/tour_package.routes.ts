@@ -1,6 +1,5 @@
 import express from 'express'
-import { create, deletePackage, getAll, updatePackage } from '../controllers/tour_package.controllers'
-import { getById } from '../controllers/user.controller'
+import { create, deletePackage, getAll, getById, updatePackage } from '../controllers/tour_package.controllers'
 
 const router = express.Router()
 
