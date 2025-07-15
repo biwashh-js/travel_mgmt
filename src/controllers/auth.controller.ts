@@ -5,10 +5,12 @@ import { comparePassword, hashPassword } from "../utils/bcrypt.utils"
 import bcrypt from 'bcryptjs'
 import customError from "../middlewares/error-handler.middleware"
 import { asyncHandler } from "../utils/async-handler.utils"
+import { generateToken } from "../utils/jwt.utils"
+import { IPayload } from "../types/global.types"
 
 
 export const register = asyncHandler(async(req:Request, res:Response, next:NextFunction) => {
-        const {firstName,lastName,email,password,phone,gender} = req.body
+        const {firstName,lastName,email,password,phone,gender,role} = req.body
 
         if(!password){
             throw new customError('password is required',404)
@@ -20,7 +22,8 @@ export const register = asyncHandler(async(req:Request, res:Response, next:NextF
             email,
             // password,
             phone,
-            gender
+            gender,
+            role
         });
             
         const hashedPassword = await hashPassword(password)
@@ -63,12 +66,25 @@ export const login =asyncHandler( async (req: Request, res: Response, next:NextF
             }
         
             // generate token
+        const payload:IPayload= {
+            _id:user._id,
+            email:user.email,
+            firstName:user.firstName,
+            lastName:user.lastName,
+            role: user.role
+        }
+
+        const token = generateToken(payload)
+        console.log(token)
             
         res.status(200).json({
             message:'login successful',
             status:"success",
             success:true,
-            data:userData
+            data:{
+                data:userData,
+                access_token:token
+            }
         })
 }
 )
