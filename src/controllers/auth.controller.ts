@@ -77,7 +77,12 @@ export const login =asyncHandler( async (req: Request, res: Response, next:NextF
         const token = generateToken(payload)
         console.log(token)
             
-        res.status(200).json({
+        res.cookie('access_token',token,{
+            secure:process.env.NODE_ENV === 'development' ? false :true,
+            httpOnly:true,
+            maxAge:Number(process.env.COOKIE_EXPIRES_IN ?? '7') * 24 * 60 * 60 * 1000 
+
+        }).status(201).json({
             message:'login successful',
             status:"success",
             success:true,
