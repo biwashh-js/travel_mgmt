@@ -8,3 +8,8 @@ export interface IPayload {
     lastName:string;
     role:Role
 }
+
+export interface IJwtPayload extends IPayload{
+    iat:number,
+    exp:number
+}

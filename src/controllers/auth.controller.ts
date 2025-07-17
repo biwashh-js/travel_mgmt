@@ -75,7 +75,7 @@ export const login =asyncHandler( async (req: Request, res: Response, next:NextF
         }
 
         const token = generateToken(payload)
-        console.log(token)
+        // console.log(token)
             
         res.cookie('access_token',token,{
             secure:process.env.NODE_ENV === 'development' ? false :true,

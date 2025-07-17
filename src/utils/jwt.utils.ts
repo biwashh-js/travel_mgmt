@@ -1,5 +1,5 @@
 import * as jwt  from 'jsonwebtoken';
-import { IPayload } from '../types/global.types';
+import { IJwtPayload, IPayload } from '../types/global.types';
 
 
 const JWT_SECRET : jwt.Secret = process.env.JWT_SECRET || 'asdfghljfgdhjhghjhgjkljbkjlh'
@@ -11,4 +11,8 @@ export const generateToken = (payload:IPayload)=>{
         expiresIn:EXP_IN as any,
 
     })
+}
+
+export const verifyToken = (token:string)=>{
+    return jwt.verify(token,JWT_SECRET) as IJwtPayload
 }
