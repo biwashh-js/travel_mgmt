@@ -4,7 +4,7 @@ import { verifyToken } from "../utils/jwt.utils";
 import User from "../models/user.models";
 import { IJwtPayload } from "../types/global.types";
 
-export const authenticate = ()=>{
+export const authenticate = (allowedRole:string)=>{
     return async (req:Request,res:Response,next:NextFunction)=>{
         try{
             const token = req.cookies.access_token;
@@ -30,7 +30,7 @@ export const authenticate = ()=>{
             }
 
             //role based
-            if(decodedData.role === 'USER'){
+            if(decodedData.role!==allowedRole){
                 throw new customError('Unathorized. Access denied', 401)
             }
 
