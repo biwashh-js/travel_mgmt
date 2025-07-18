@@ -7,16 +7,16 @@ const packageSchema = new Schema({
         required:[true,'title is required'],
         trim:true
     },
-    // cover_image:{
-    //     type:String,
-    //     required:[true,'cover_image is required'],
+    cover_image:{
+        type:String,
+        required:[true,'cover_image is required'],
 
-    // },
-    // images:[
-    //     {
-    //         type:String
-    //     }
-    // ],
+    },
+    images:[
+        {
+            type:String
+        }
+    ],
     destinations:[
         {
             location:{
