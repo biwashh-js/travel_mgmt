@@ -10,7 +10,7 @@ import { IPayload } from "../types/global.types"
 
 
 export const register = asyncHandler(async(req:Request, res:Response, next:NextFunction) => {
-        const {firstName,lastName,email,password,phone,gender,role} = req.body
+        const {firstName,lastName,email,password,phone,gender} = req.body
 
         if(!password){
             throw new customError('password is required',404)
@@ -22,8 +22,7 @@ export const register = asyncHandler(async(req:Request, res:Response, next:NextF
             email,
             // password,
             phone,
-            gender,
-            role
+            gender
         });
             
         const hashedPassword = await hashPassword(password)

@@ -2,19 +2,26 @@ import { NextFunction, Request, Response } from "express";
 import { asyncHandler } from "../utils/async-handler.utils";
 import Tour_Package from "../models/tour_package.model";
 import customError from "../middlewares/error-handler.middleware";
+import { Multer } from "multer";
 
 export const create = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const{title,destinations,start_date,end_date,seats_available,total_charge,cost_type,description} = req.body
-    
+
+    const {cover_image} = req.files as {[fieldname:string]: Express.Multer.File[]}
+
+    if(!cover_image){
+        throw new customError('cover image is required',400)
+    }
     const tour_package = await Tour_Package.create({
         title,
-        destinations:JSON.parse(destinations),
+        destinations:destinations? JSON.parse(destinations) : null,
         start_date : new Date(start_date),
         end_date : new Date(end_date),
         seats_available,
         total_charge,
         cost_type,
-        description
+        description,
+        cover_image:cover_image[0].path
 
     })
 

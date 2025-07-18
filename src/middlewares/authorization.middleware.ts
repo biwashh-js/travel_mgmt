@@ -3,8 +3,9 @@ import customError from "./error-handler.middleware";
 import { verifyToken } from "../utils/jwt.utils";
 import User from "../models/user.models";
 import { IJwtPayload } from "../types/global.types";
+import { Role } from "../types/enum.types";
 
-export const authenticate = (allowedRole:string)=>{
+export const authenticate = (roles:Role[])=>{
     return async (req:Request,res:Response,next:NextFunction)=>{
         try{
             const token = req.cookies.access_token;
@@ -26,12 +27,15 @@ export const authenticate = (allowedRole:string)=>{
 
             // token expiry
             if(Date.now()> decodedData?.exp*1000){
+                res.clearCookie('access_token',{
+                    maxAge:Date.now()
+                })
                 throw new customError('Unathorized. Access Denied',401)
             }
 
             //role based
-            if(decodedData.role!==allowedRole){
-                throw new customError('Unathorized. Access denied', 401)
+            if(Array.isArray(roles) && (!roles?.includes(user.role) || !roles?.includes(decodedData.role))){
+                throw new customError('Forbidden. you cannot access this resource.', 403)
             }
 
             next()
