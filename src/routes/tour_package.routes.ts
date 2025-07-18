@@ -4,7 +4,7 @@ import { authenticate } from '../middlewares/authorization.middleware'
 
 const router = express.Router()
 
-router.post('/',create)
+router.post('/',authenticate('ADMIN'),create)
 router.get('/',authenticate('ADMIN'),getAll)
 router.get('/:packageId',getById)
 router.delete('/:packageId',deletePackage)

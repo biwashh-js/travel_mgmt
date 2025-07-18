@@ -8,7 +8,7 @@ export const authenticate = (allowedRole:string)=>{
     return async (req:Request,res:Response,next:NextFunction)=>{
         try{
             const token = req.cookies.access_token;
-            console.log(token)
+            // console.log(token)
 
             if(!token){
                 throw new customError('Unathorized. Access denied',401)
@@ -16,7 +16,7 @@ export const authenticate = (allowedRole:string)=>{
 
             //decode token
             const decodedData:IJwtPayload= verifyToken(token)
-            console.log(decodedData)
+            // console.log(decodedData)
 
             // check if user exists in database
             const user = await User.findOne({email:decodedData.email})
