@@ -7,8 +7,8 @@ import { Multer } from "multer";
 export const create = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const{title,destinations,start_date,end_date,seats_available,total_charge,cost_type,description} = req.body
 
-    const {cover_image} = req.files as {[fieldname:string]: Express.Multer.File[]}
-
+    const {cover_image,images} = req.files as {[fieldname:string]: Express.Multer.File[]}
+    console.log(images)
     if(!cover_image){
         throw new customError('cover image is required',400)
     }
@@ -21,7 +21,8 @@ export const create = asyncHandler(async(req:Request,res:Response,next:NextFunct
         total_charge,
         cost_type,
         description,
-        cover_image:cover_image[0].path
+        cover_image:cover_image[0].path,
+        images: images.map(images=>images.path)
 
     })
 
