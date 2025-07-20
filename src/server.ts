@@ -10,6 +10,7 @@ import userRoutes from './routes/user.routes'
 import packageRoutes from './routes/tour_package.routes'
 
 
+
 const PORT = process.env.PORT || 8080
 const DB_URI = process.env.DB_URI ?? ''
 const app = express()
@@ -25,6 +26,10 @@ app.use(express.urlencoded({extended:true,limit:'5mb'}))
 app.use(express.json({limit:'5mb'}))
 app.use(cookieParser())
 
+
+// serving static files
+app.use('/api/uploads/',express.static('uploads/'))
+
 app.get('/',(req,res)=>{
 
     res.status(200).json({
@@ -37,6 +42,7 @@ app.get('/',(req,res)=>{
 app.use('/api/auth',authRoutes)
 app.use('/api/user',userRoutes)
 app.use('/api/tour_package',packageRoutes)
+
 
 // fallback routing
 app.all('{*spalt}',(req:Request, res:Response, next:NextFunction) => {

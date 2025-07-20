@@ -8,11 +8,11 @@ export const create = asyncHandler(async(req:Request,res:Response,next:NextFunct
     const{title,destinations,start_date,end_date,seats_available,total_charge,cost_type,description} = req.body
 
     const {cover_image,images} = req.files as {[fieldname:string]: Express.Multer.File[]}
-    console.log(images)
+    // console.log(images)
     if(!cover_image){
         throw new customError('cover image is required',400)
     }
-    const tour_package = await Tour_Package.create({
+    const tour_package = new Tour_Package({
         title,
         destinations:destinations? JSON.parse(destinations) : null,
         start_date : new Date(start_date),
@@ -21,15 +21,21 @@ export const create = asyncHandler(async(req:Request,res:Response,next:NextFunct
         total_charge,
         cost_type,
         description,
-        cover_image:cover_image[0].path,
-        images: images.map(images=>images.path)
+       
 
     })
 
     if(!tour_package){
         throw new customError('something went wrong. Try again later',500)
     }
-
+    
+    
+    tour_package.cover_image = cover_image[0].path
+    if(images && images.length>0){
+        const imagePath = images.map(image=>image.path)
+        tour_package.images = imagePath
+    }
+    await tour_package.save()
      
     res.status(201).json({
         message:'package created successfully',
@@ -48,8 +54,6 @@ export const getAll = asyncHandler(async(req:Request,res:Response,next:NextFunct
             data:tour_packages
         })
 })
-
-
 
 
 export const getById = asyncHandler(async(req:Request, res:Response, next:NextFunction) =>{
