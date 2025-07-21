@@ -27,6 +27,15 @@ router.post('/',authenticate(allAdmins),uploader.fields([
     }
 ]),create)
 router.delete('/:packageId',authenticate(allAdmins),deletePackage)
-router.put('/:packageId',authenticate(allAdmins),updatePackage)
+router.put('/:packageId',authenticate(allAdmins),uploader.fields([
+    {
+        name:'cover_image',
+        maxCount:1
+    },
+    {
+        name:'images',
+        maxCount:5
+    }
+]),updatePackage)
 
 export default router
