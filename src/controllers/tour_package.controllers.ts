@@ -3,7 +3,10 @@ import { asyncHandler } from "../utils/async-handler.utils";
 import Tour_Package from "../models/tour_package.model";
 import customError from "../middlewares/error-handler.middleware";
 import { Multer } from "multer";
-import fs from 'fs'
+import { uploadFile } from "../utils/cloudinary.utils";
+
+
+const tour_package_folder = '/tour_packages'
 
 export const create = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const{title,destinations,start_date,end_date,seats_available,total_charge,cost_type,description} = req.body
@@ -31,7 +34,7 @@ export const create = asyncHandler(async(req:Request,res:Response,next:NextFunct
     }
     
     
-    tour_package.cover_image = cover_image[0].path
+    tour_package.cover_image = await uploadFile(cover_image[0].path,tour_package_folder)
     if(images && images.length>0){
         const imagePath = images.map(image=>image.path)
         tour_package.images = imagePath
@@ -126,7 +129,7 @@ export const updatePackage = asyncHandler(async(req:Request,res:Response,next:Ne
     if(description) tour_package.cost_type = description
     
     if(cover_image){
-    tour_package.cover_image = cover_image[0].path
+    tour_package.cover_image = await uploadFile(cover_image[0].path,tour_package_folder)
     }
 
     
