@@ -22,3 +22,15 @@ export const uploadFile = async(path:string,folder:string = '/') =>{
         throw new customError('file upload error',500)
     }
 }   
+
+
+export const deleteFile = async(public_ids:string[])=>{
+    try{
+      const ids =await Promise.all(public_ids.map(async(public_id:string) => await cloudinary.uploader.destroy(public_id)))
+      return true
+    }
+    catch(error){
+        throw new customError('file delete error',500)
+    }
+
+}

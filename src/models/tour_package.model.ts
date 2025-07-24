@@ -18,9 +18,16 @@ const packageSchema = new Schema({
         }
     },
     images:[
-        {
-            type:String
+       {
+        path:{
+            type:String,
+            
+        },
+        public_id:{
+            type:String,
+          
         }
+    }
     ],
     destinations:[
         {
