@@ -15,3 +15,10 @@ export enum Package_Charge {
     PER_DAY = 'PER_DAY',
     PER_PERSON = 'PER_PERSON'
 }
+
+
+export enum Booking_Status {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  CANCELLED = "CANCELLED"
+}

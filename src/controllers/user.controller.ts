@@ -2,8 +2,10 @@ import {NextFunction, Request, RequestHandler, Response } from "express"
 import User from "../models/user.models"
 import customError from "../middlewares/error-handler.middleware"
 import { asyncHandler } from "../utils/async-handler.utils"
+import { deleteFile, uploadFile } from "../utils/cloudinary.utils"
 
 
+const user_folder = '/user'
 
 //get all user
 
@@ -45,8 +47,10 @@ const {userId} = req.params
 export const updateProfile =asyncHandler(  async(req:Request, res:Response, next:NextFunction) =>{
       const {firstName,lastName,phone,gender} = req.body
       const {userId} = req.params
-      const user = await User.findById(userId)
+      const profile_image = req.file as Express.Multer.File;
 
+      const user = await User.findById(userId)
+      
       if(!user){
             throw new customError("user not found",404);
         }
@@ -56,6 +60,12 @@ export const updateProfile =asyncHandler(  async(req:Request, res:Response, next
     if(phone) user.phone = phone
     if(gender) user.gender = gender
     
+    if(profile_image){
+        if(user.profile_image?.public_id){
+            await deleteFile([user?.profile_image?.public_id])
+        }
+        user.profile_image = await uploadFile(profile_image.path,user_folder)
+    }
     await user.save()
 
     // OR findByIdAndUpdate ({id},{firstName,lastName,phone,gender},{new:true})
@@ -74,13 +84,19 @@ export const updateProfile =asyncHandler(  async(req:Request, res:Response, next
 
 export const deleteUser = asyncHandler(async(req:Request,res:Response,next:NextFunction) => {
         const {userId} = req.params
-         const deleteUser = await User.findByIdAndDelete(userId)
+         const user = await User.findById(userId)
 
-      if(!deleteUser){
+
+         if(!user){
             throw new customError("user not found",404);
         }
+
+        if(user.profile_image?.public_id){
+          await deleteFile([user.profile_image?.public_id])
+        }
     
-    
+        await user.deleteOne()
+        
     res.status(200).json({
         message:`user deleted sucessfully`,
         success:true,
