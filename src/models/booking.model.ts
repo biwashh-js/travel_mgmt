@@ -1,32 +1,27 @@
-import { Schema, model, Types } from "mongoose";
-import { Booking_Status } from "../types/enum.types"; 
+import mongoose, { model, Schema } from "mongoose";
 
 const bookingSchema = new Schema({
   user: {
-    required: true
+    type:mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'user'
   },
   tour_package: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Tour_Package',
     required: true
   },
-  seats_booked: {
+  total_person:{
+    type:Number,
+    min:[1,'minimum 1 person is required'],
+    required:[true,'total person is required']
+
+  },
+  total_amount: {
     type: Number,
-    required: [true, "Number of seats booked is required"],
-    min: [1, "At least one seat must be booked"]
-  },
-  total_price: {
-    type: Number,
-    required: true
-  },
-  travel_date: {
-    type: Date,
-    required: true
-  },
-  status: {
-    type: String,
-    enum: Object.values(Booking_Status),
-    default: Booking_Status.PENDING
-  },
+    required: [true,'total amount is required']
+  }
 }, { timestamps: true });
 
-const Booking = model("Booking", bookingSchema);
+const Booking = model("booking", bookingSchema);
 export default Booking;
