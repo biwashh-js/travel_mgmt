@@ -1,15 +1,20 @@
 import express from 'express'
-import { book, getAll, getById, update } from '../controllers/booking.controller'
+import { book,cancel,confirm,getAllBookings, getAllBookingsByTourPackage, getById, getUserBooking, update } from '../controllers/booking.controller'
 import { authenticate } from '../middlewares/authorization.middleware'
-import { allAdmins, allUserAndAdmins } from '../types/global.types'
+import { allAdmins, allUserAndAdmins, onlyUser } from '../types/global.types'
 
 
 
 const router = express.Router()
 
-router.post('/',authenticate(allAdmins),book)
-router.get('/',getAll)
-router.get('/:id',authenticate(allAdmins),getById)
-router.put('/:id',authenticate(allUserAndAdmins),update)
+router.post('/',authenticate(onlyUser),book)
+router.put('/confirm/:id',authenticate(allAdmins),confirm)
+router.put('/cancel/:id',authenticate(allAdmins),cancel)
+router.get('/',authenticate(allAdmins),getAllBookings)
+router.get('/:id',authenticate(allUserAndAdmins),getById)
+router.get('/package/:packageId',authenticate(allAdmins),getAllBookingsByTourPackage)
+router.get('/user',authenticate(onlyUser),getUserBooking)
+router.put('/:id',authenticate(onlyUser),update)
+
 
 export default router

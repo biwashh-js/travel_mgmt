@@ -29,5 +29,5 @@ const bookingSchema = new Schema({
   }
 }, { timestamps: true });
 
-const Booking = model("booking", bookingSchema);
+const   Booking = model("booking", bookingSchema);
 export default Booking;

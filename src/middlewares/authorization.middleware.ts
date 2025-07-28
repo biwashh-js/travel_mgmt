@@ -38,6 +38,14 @@ export const authenticate = (roles:Role[])=>{
                 throw new customError('Forbidden. you cannot access this resource.', 403)
             }
 
+            req.user = {
+                    _id:user._id,
+                    email:user.email,
+                    firstName:user.firstName,
+                    lastName:user.lastName,
+                    role:user.role
+            }
+
             next()
             
         } catch(error){

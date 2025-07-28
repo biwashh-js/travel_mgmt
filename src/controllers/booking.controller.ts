@@ -8,6 +8,7 @@ import { Booking_Status, Package_Charge } from "../types/enum.types";
 // create booking
 export const book = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const {tour_package,total_person} = req.body
+    const user = req.user._id
     let total_cost:number
 
     if(!tour_package){
@@ -22,7 +23,7 @@ export const book = asyncHandler(async(req:Request,res:Response,next:NextFunctio
         throw new customError(`only ${tourPackage.seats_available} seats left`,400)
     }
 
-    const booking = new Booking({total_person,tour_package:tourPackage._id})
+    const booking = new Booking({total_person,tour_package:tourPackage._id,user})
     
     if(tourPackage.cost_type === Package_Charge.PER_PERSON){
         total_cost = Number(total_person) * Number(tourPackage?.total_charge)
@@ -33,12 +34,12 @@ export const book = asyncHandler(async(req:Request,res:Response,next:NextFunctio
         total_cost = totalDays * total_person * Number(tourPackage?.total_charge) 
         booking.total_amount = total_cost
     }
+    tourPackage.seats_available -= Number(total_person)
     
 
-    tourPackage.seats_available -= Number(total_person)
 
-    await tourPackage.save()
     await booking.save()
+    await tourPackage.save()
     
     res.status(200).json({
         message: 'Package booked',
@@ -49,10 +50,9 @@ export const book = asyncHandler(async(req:Request,res:Response,next:NextFunctio
 })
 
 
-//get all
-
-export const getAll = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    const bookings = await Booking.find()
+//get all bookings for admin
+export const getAllBookings = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const bookings = await Booking.find().populate("tour_package").populate('user')
 
     res.status(200).json({
         message:'all booking fetched',
@@ -62,10 +62,26 @@ export const getAll = asyncHandler(async(req:Request,res:Response,next:NextFunct
     })
 })
 
-//get bty id
+
+// get all bookings by tour package
+
+export const getAllBookingsByTourPackage= asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const {packageId} = req.params
+    const bookings = await Booking.find({tour_package:packageId}).populate("tour_package").populate('user')
+
+    res.status(200).json({
+        message:'all booking fetched',
+        success:true,
+        status:'success',
+        data:bookings
+    })
+})
+
+
+//get by id
 export const getById = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const {id} = req.params
-    const booking = Booking.findById(id)
+    const booking = Booking.findById(id).populate("tour_package").populate("user")
     if(!booking){
         throw new customError('booking not found',404)
 
@@ -77,6 +93,20 @@ export const getById = asyncHandler(async(req:Request,res:Response,next:NextFunc
             data:booking
         })
 
+})
+
+
+//get users booking of logged in user
+export const getUserBooking = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const user = req.user._id
+    const bookings = await Booking.find({user}).populate("tour_package")
+
+    res.status(200).json({
+        message:'booking fetched',
+        data:bookings,
+        success:true,
+        status:'success'
+    })
 })
 
 //cancel
@@ -108,7 +138,7 @@ export const cancel = asyncHandler(async(req:Request,res:Response,next:NextFunct
 })
 
 //confirm
-export const confirmed = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+export const confirm = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const {id} = req.params
     const booking = await Booking.findById(id)
     if(!booking){
@@ -133,7 +163,7 @@ export const confirmed = asyncHandler(async(req:Request,res:Response,next:NextFu
 export const update = asyncHandler(async(req:Request, res:Response, next:NextFunction)=>{
     const {id} = req.params
     const { total_person } = req.body
-
+    let total_cost:number
     const booking = await Booking.findById(id)
 
     if(!booking){
@@ -160,11 +190,18 @@ export const update = asyncHandler(async(req:Request, res:Response, next:NextFun
         }
         booking.total_person = total_person
     }
+    if(tour_package.cost_type === Package_Charge.PER_PERSON){
+        total_cost = Number(total_person) * Number(tour_package?.total_charge)
+        booking.total_amount = total_cost
+    }
+     else{
+        const totalDays:any = new Date(tour_package.end_date).getDate() - new Date(tour_package.start_date).getDate()
+        total_cost = totalDays * total_person * Number(tour_package?.total_charge) 
+        booking.total_amount = total_cost
+    }
 
-    booking.total_amount = Number(booking.total_person) * Number(tour_package?.total_charge)
-
-    await tour_package.save()
     await booking.save()
+    await tour_package.save()
 
     res.status(200).json({
         message:'booking updated',
@@ -175,3 +212,6 @@ export const update = asyncHandler(async(req:Request, res:Response, next:NextFun
 
 
 })
+
+
+
