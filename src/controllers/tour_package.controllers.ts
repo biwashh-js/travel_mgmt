@@ -9,7 +9,7 @@ import { deleteFile, uploadFile } from "../utils/cloudinary.utils";
 const tour_package_folder = '/tour_packages'
 
 export const create = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    const{title,destinations,start_date,end_date,seats_available,total_charge,cost_type,description} = req.body
+    const{title,destinations,start_date,end_date,seats_available,total_charge,total_seats,cost_type,description} = req.body
 
     const {cover_image,images} = req.files as {[fieldname:string]: Express.Multer.File[]}
     // console.log(images)
@@ -21,7 +21,8 @@ export const create = asyncHandler(async(req:Request,res:Response,next:NextFunct
         destinations:destinations? JSON.parse(destinations) : null,
         start_date : new Date(start_date),
         end_date : new Date(end_date),
-        seats_available,
+        seats_available:total_seats,
+        total_seats,
         total_charge,
         cost_type,
         description,

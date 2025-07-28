@@ -54,6 +54,10 @@ const packageSchema = new Schema({
         type:Number,
         required:[true,'total available seats are required']
     },
+    total_seats:{
+        type:Number,
+        required:[true,'total seats is required']
+    },
     total_charge:{
         type:Number,
         required:[true,'total_charge is required']

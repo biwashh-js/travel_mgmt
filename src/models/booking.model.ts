@@ -1,4 +1,5 @@
 import mongoose, { model, Schema } from "mongoose";
+import { Booking_Status } from "../types/enum.types";
 
 const bookingSchema = new Schema({
   user: {
@@ -20,6 +21,11 @@ const bookingSchema = new Schema({
   total_amount: {
     type: Number,
     required: [true,'total amount is required']
+  },
+  status:{
+    type:String,
+    default:Booking_Status.PENDING,
+    enum:Object.values(Booking_Status)
   }
 }, { timestamps: true });
 

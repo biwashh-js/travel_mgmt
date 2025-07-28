@@ -8,7 +8,7 @@ import customError, {errorHandler} from './middlewares/error-handler.middleware'
 import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
 import packageRoutes from './routes/tour_package.routes'
-
+import bookingRoutes from './routes/booking.routes'
 
 
 const PORT = process.env.PORT || 8080
@@ -42,7 +42,7 @@ app.get('/',(req,res)=>{
 app.use('/api/auth',authRoutes)
 app.use('/api/user',userRoutes)
 app.use('/api/tour_package',packageRoutes)
-
+app.use('/api/booking',bookingRoutes)
 
 // fallback routing
 app.all('{*spalt}',(req:Request, res:Response, next:NextFunction) => {

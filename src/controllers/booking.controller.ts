@@ -3,10 +3,12 @@ import { asyncHandler } from "../utils/async-handler.utils";
 import customError from "../middlewares/error-handler.middleware";
 import Tour_Package from "../models/tour_package.model";
 import Booking from "../models/booking.model";
+import { Booking_Status, Package_Charge } from "../types/enum.types";
 
-
+// create booking
 export const book = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const {tour_package,total_person} = req.body
+    let total_cost:number
 
     if(!tour_package){
         throw new customError('tour package is required',400)
@@ -15,12 +17,161 @@ export const book = asyncHandler(async(req:Request,res:Response,next:NextFunctio
     if(!tourPackage){
         throw new customError('package not found',400)
     }
-    const booking = await Booking.create({total_person,tour_package:tourPackage._id})
 
+    if(tourPackage?.seats_available<Number(total_person)){
+        throw new customError(`only ${tourPackage.seats_available} seats left`,400)
+    }
+
+    const booking = new Booking({total_person,tour_package:tourPackage._id})
+    
+    if(tourPackage.cost_type === Package_Charge.PER_PERSON){
+        total_cost = Number(total_person) * Number(tourPackage?.total_charge)
+        booking.total_amount = total_cost
+    }
+    else{
+        const totalDays:any = new Date(tourPackage.end_date).getDate() - new Date(tourPackage.start_date).getDate()
+        total_cost = totalDays * total_person * Number(tourPackage?.total_charge) 
+        booking.total_amount = total_cost
+    }
+    
+
+    tourPackage.seats_available -= Number(total_person)
+
+    await tourPackage.save()
+    await booking.save()
+    
     res.status(200).json({
         message: 'Package booked',
         data: booking,
         status:"success",
         success: true
     })
+})
+
+
+//get all
+
+export const getAll = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const bookings = await Booking.find()
+
+    res.status(200).json({
+        message:'all booking fetched',
+        success:true,
+        status:'success',
+        data:bookings
+    })
+})
+
+//get bty id
+export const getById = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const {id} = req.params
+    const booking = Booking.findById(id)
+    if(!booking){
+        throw new customError('booking not found',404)
+
+    }
+        res.status(200).json({
+            message:`booking fetched`,
+            status:"success",
+            success:true,
+            data:booking
+        })
+
+})
+
+//cancel
+export const cancel = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const {id} = req.params
+
+    const booking = await Booking.findById(id)
+
+    if(!booking){
+        throw new customError('booking not found',404)
+    }
+    const tour_package = await Tour_Package.findById(booking.tour_package)
+    booking.status = Booking_Status.CANCELLED
+
+    if(tour_package){
+    tour_package.seats_available += Number(booking.total_person)
+    await tour_package.save()
+    }
+
+    await booking.save()
+
+    res.status(200).json({
+        message:'Booking cancelled',
+        status:'success',
+        success:true,
+        data:booking
+    })
+
+})
+
+//confirm
+export const confirmed = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const {id} = req.params
+    const booking = await Booking.findById(id)
+    if(!booking){
+        throw new customError('booking not found',404)
+    }
+
+
+    booking.status  = Booking_Status.CONFIRMED
+    await booking.save()
+
+    //confirmation email
+
+    res.status(200).json({
+        message:'Booking confirmed',
+        status:'success',
+        success:true,
+        data:booking
+    })
+})
+
+//update
+export const update = asyncHandler(async(req:Request, res:Response, next:NextFunction)=>{
+    const {id} = req.params
+    const { total_person } = req.body
+
+    const booking = await Booking.findById(id)
+
+    if(!booking){
+        throw new customError('booking not found',404)
+    }
+
+     const tour_package = await Tour_Package.findById(booking.tour_package)
+     if(!tour_package){
+        throw new customError('tour package not found',404)
+     }
+
+    if(total_person){
+        const oldPerson = booking.total_person
+        const difference = total_person - oldPerson
+
+        if(difference > 0){
+            if(tour_package.seats_available < difference){
+                throw new customError('Not enough seats avaibale',400)
+            }
+            tour_package.seats_available -= difference
+        }
+        else if(difference < 0){
+            tour_package.seats_available += Math.abs(difference)
+        }
+        booking.total_person = total_person
+    }
+
+    booking.total_amount = Number(booking.total_person) * Number(tour_package?.total_charge)
+
+    await tour_package.save()
+    await booking.save()
+
+    res.status(200).json({
+        message:'booking updated',
+        status:'success',
+        success: true,
+        data:booking
+    })
+
+
 })

@@ -6,6 +6,7 @@ export const onlyUser = [Role.USER]
 export const onlySuperAdmin = [Role.SUPER_ADMIN]
 export const onlyAdmin = [Role.ADMIN]
 export const allAdmins = [Role.SUPER_ADMIN,Role.ADMIN]
+export const allUserAndAdmins= [Role.ADMIN,Role.SUPER_ADMIN,Role.USER]
 
 export interface IPayload {
     _id:mongoose.Types.ObjectId;

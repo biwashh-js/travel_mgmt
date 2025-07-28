@@ -17,4 +17,8 @@ export enum Package_Charge {
 }
 
 
-
+export enum Booking_Status {
+    PENDING = "PENDING",
+    CONFIRMED= "CONFIRMED",
+    CANCELLED = "CANCELLED"
+}
