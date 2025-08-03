@@ -4,6 +4,8 @@ import customError from "../middlewares/error-handler.middleware";
 import Tour_Package from "../models/tour_package.model";
 import Booking from "../models/booking.model";
 import { Booking_Status, Package_Charge } from "../types/enum.types";
+import { sendMail } from "../utils/nodemailer.utils";
+import { getPagination } from "../utils/pagination.utils";
 
 // create booking
 export const book = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
@@ -36,7 +38,26 @@ export const book = asyncHandler(async(req:Request,res:Response,next:NextFunctio
     }
     tourPackage.seats_available -= Number(total_person)
     
-
+    let html = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: auto; padding: 20px; background-color: #f8f9fa;">
+    
+        <p>Thank you for booking with us! Here are your booking details:</p>
+        <ul>
+          <li><strong>Tour Package:</strong> ${tourPackage.title}<li>
+          <li><strong>Total Persons:</strong> ${booking.total_person}</li>
+          <li><strong>Total Amount:</strong> NPR ${booking.total_amount}</li>
+          <li><strong>Status:</strong> ${booking.status}</li>
+        </ul>
+        <p>We’ll keep you updated with any changes to your booking status.</p>
+        <p>Regards,<br/>Travel Booking Team</p>
+      </div>
+    `
+      await sendMail({
+      html,
+      
+      to: req.user.email,
+      subject: "Booking success",
+    });
 
     await booking.save()
     await tourPackage.save()
@@ -52,13 +73,21 @@ export const book = asyncHandler(async(req:Request,res:Response,next:NextFunctio
 
 //get all bookings for admin
 export const getAllBookings = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    const bookings = await Booking.find().populate("tour_package").populate('user')
+   
+    const {query,limit,page} = req.query
+    const page_limit = Number(limit) || 15
+    const current_page = Number(page) || 1
+
+    const skip = (current_page - 1)*page_limit
+    
+    const bookings = await Booking.find({}).skip(skip).limit(page_limit).sort({createdAt: -1}).populate("tour_package").populate('user')
+     const total = await Booking.countDocuments({})
 
     res.status(200).json({
         message:'all booking fetched',
         success:true,
         status:'success',
-        data:bookings
+        data:{bookings, pagination:getPagination(total,page_limit,current_page)}
     })
 })
 
@@ -67,13 +96,20 @@ export const getAllBookings = asyncHandler(async(req:Request,res:Response,next:N
 
 export const getAllBookingsByTourPackage= asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const {packageId} = req.params
-    const bookings = await Booking.find({tour_package:packageId}).populate("tour_package").populate('user')
+      const {query,limit,page} = req.query
+    const page_limit = Number(limit) || 15
+    const current_page = Number(page) || 1
+    const skip = (current_page - 1)*page_limit
+
+    const bookings = await Booking.find({tour_package:packageId}).skip(skip).limit(page_limit).sort({createdAt: -1}).populate("tour_package").populate('user')
+
+    const total = await Booking.countDocuments({tour_package:packageId})
 
     res.status(200).json({
         message:'all booking fetched',
         success:true,
         status:'success',
-        data:bookings
+        data:{bookings, pagination: getPagination(total,page_limit,current_page)}
     })
 })
 
@@ -215,3 +251,9 @@ export const update = asyncHandler(async(req:Request, res:Response, next:NextFun
 
 
 
+
+
+
+
+// filter get bookings by user
+// -> filter

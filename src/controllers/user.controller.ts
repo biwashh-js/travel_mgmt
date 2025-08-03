@@ -3,6 +3,7 @@ import User from "../models/user.models"
 import customError from "../middlewares/error-handler.middleware"
 import { asyncHandler } from "../utils/async-handler.utils"
 import { deleteFile, uploadFile } from "../utils/cloudinary.utils"
+import { getPagination } from "../utils/pagination.utils"
 
 
 const user_folder = '/user'
@@ -11,14 +12,41 @@ const user_folder = '/user'
 
 export const getAllUser = asyncHandler(
     async(req:Request, res: Response, next:NextFunction)=> {
-   
-        const users:any = await User.find().select("-password")
+
+    const {query,limit,page} = req.query
+    const page_limit = Number(limit) || 15
+    const current_page = Number(page) || 1
+
+    const skip = (current_page - 1)*page_limit
+        
+    
+    // let filter:Record<string,any> = {}
+
+    // if(query){
+    //     filter.$or=[
+    //         {
+    //          firstName:{
+    //             $options:'i',
+    //             $regex:query
+    //             } },
+    //              {
+    //                 lastName:{
+    //                  $options:'i',
+    //                  $regex:query
+    //             }},
+                
+
+    //     ]
+    // }
+
+        const users:any = await User.find({}).skip(skip).limit(page_limit).sort({createdAt: -1}).select("-password")
+         const total = await User.countDocuments({})
 
         res.status(200).json({
             message:'All users fetched',
             status:'success',
             success:true,
-            data:users
+            data:{users, pagination:getPagination(total,page_limit,current_page)}
         })
 
 })

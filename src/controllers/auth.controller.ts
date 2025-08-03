@@ -7,6 +7,7 @@ import customError from "../middlewares/error-handler.middleware"
 import { asyncHandler } from "../utils/async-handler.utils"
 import { generateToken } from "../utils/jwt.utils"
 import { IPayload } from "../types/global.types"
+import { sendMail } from "../utils/nodemailer.utils"
 
 
 export const register = asyncHandler(async(req:Request, res:Response, next:NextFunction) => {
@@ -74,6 +75,7 @@ export const login =asyncHandler( async (req: Request, res: Response, next:NextF
         }
 
         const token = generateToken(payload)
+
         // console.log(token)
             
         res.cookie('access_token',token,{

@@ -4,6 +4,7 @@ import Tour_Package from "../models/tour_package.model";
 import customError from "../middlewares/error-handler.middleware";
 import { Multer } from "multer";
 import { deleteFile, uploadFile } from "../utils/cloudinary.utils";
+import { getPagination } from "../utils/pagination.utils";
 
 
 const tour_package_folder = '/tour_packages'
@@ -53,12 +54,70 @@ export const create = asyncHandler(async(req:Request,res:Response,next:NextFunct
 
 //get all
 export const getAll = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    const tour_packages = await Tour_Package.find({})
+
+    const {query,start_date,end_date,min_price,max_price,seats_available,limit,page} = req.query
+    const page_limit = Number(limit) || 15
+    const current_page = Number(page) || 1
+
+    const skip = (current_page - 1)*page_limit
+
+    let filter:Record<string,any> = {}
+
+    if(query){
+        filter.$or=[
+            {
+             title:{
+                $options:'i',
+                $regex:query
+                } },
+                 {
+                    description:{
+                     $options:'i',
+                     $regex:query
+                }},
+
+
+        ]
+    }
+
+    if(start_date || end_date){
+        filter.start_date = {
+            $gte:start_date
+        }
+    
+    }
+     if(end_date){
+        filter.start_date = {
+            $lte:end_date
+        }
+    }
+
+      if(min_price|| max_price){
+        filter.total_charge = {
+            $gte:min_price
+        }
+    }
+     if(max_price){
+        filter.total_charge= {
+            $lte:max_price
+        }
+    }
+
+    if(seats_available){
+        filter.seats_available  ={
+            $gte:seats_available
+        }
+    }
+    
+
+    const tour_packages = await Tour_Package.find(filter).limit(page_limit).skip(skip)
+    const total = await Tour_Package.countDocuments(filter)
+   
       res.status(200).json({
             message:'packages fetched successfully.',
             status:'success',
             success:true,
-            data:tour_packages
+            data:{data:tour_packages ,pagination:getPagination(total,page_limit,current_page) }
         })
 })
 
