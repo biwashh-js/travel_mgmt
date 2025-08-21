@@ -94,3 +94,41 @@ export const login =asyncHandler( async (req: Request, res: Response, next:NextF
         })
 }
 )
+
+
+
+// !logout
+export const logout = asyncHandler((req:Request,res:Response) =>{
+  res.clearCookie('access_token',{
+            httpOnly:true,
+            sameSite:'none',
+            secure: process.env.NODE_ENV === "development" ? false : true,
+    })
+    .status(200)
+    .json({
+        message:'Logged out successfully',
+        success:true,
+        status:'success',
+        data:null
+    })
+})
+
+// get profile
+export const profile = asyncHandler(async(req:Request,res:Response)=>{
+
+  const user_id = req.user._id;
+
+  const user = await User.findById(user_id);
+
+  if(!user){
+    throw new customError('profile not found',404)
+  }
+
+  res.status(200).json({
+    mesage:'profile fetched',
+    data:user,
+    success:true,
+    status:'success'
+  })
+
+})
