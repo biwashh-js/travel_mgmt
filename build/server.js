@@ -40,6 +40,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const express_1 = __importDefault(require("express"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const cors_1 = __importDefault(require("cors"));
+const helmet_1 = __importDefault(require("helmet"));
 const database_config_1 = require("./config/database.config");
 const error_handler_middleware_1 = __importStar(require("./middlewares/error-handler.middleware"));
 //importing routes
@@ -53,6 +55,8 @@ const app = (0, express_1.default)();
 //connect database
 (0, database_config_1.connectDatabase)(DB_URI);
 //using middlewares
+app.use((0, cors_1.default)());
+app.use((0, helmet_1.default)());
 app.use(express_1.default.urlencoded({ extended: true, limit: '5mb' }));
 app.use(express_1.default.json({ limit: '5mb' }));
 app.use((0, cookie_parser_1.default)());
