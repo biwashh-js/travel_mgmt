@@ -24,7 +24,12 @@ connectDatabase(DB_URI)
 
 
 //using middlewares
-app.use(cors())
+app.use(
+  cors({
+    origin: process.env.FRONT_END_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(helmet())
 app.use(express.urlencoded({extended:true,limit:'5mb'}))
 app.use(express.json({limit:'5mb'}))
