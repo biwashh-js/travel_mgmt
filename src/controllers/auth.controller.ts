@@ -1,119 +1,122 @@
-import {NextFunction, Request, Response} from "express"
-import User from "../models/user.models"
-import { hash } from "bcryptjs"
-import { comparePassword, hashPassword } from "../utils/bcrypt.utils"
-import bcrypt from 'bcryptjs'
-import customError from "../middlewares/error-handler.middleware"
-import { asyncHandler } from "../utils/async-handler.utils"
-import { generateToken } from "../utils/jwt.utils"
-import { IPayload } from "../types/global.types"
-import { sendMail } from "../utils/nodemailer.utils"
+import { NextFunction, Request, Response } from "express";
+import User from "../models/user.models";
+import { comparePassword, hashPassword } from "../utils/bcrypt.utils";
+import CustomError from "../middlewares/error-handler.middleware";
+import { asyncHandler } from "../utils/async-handler.utils";
+import { generateToken } from "../utils/jwt.utils";
+import { IPayload } from "../types/global.types";
+import { sendMail } from "../utils/nodemailer.utils";
 
+export const register = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { firstName, lastName, email, password, phone, gender } = req.body;
 
-export const register = asyncHandler(async(req:Request, res:Response, next:NextFunction) => {
-        const {firstName,lastName,email,password,phone,gender} = req.body
+    if (!password) {
+      throw new CustomError("password is required", 400);
+    }
 
-        if(!password){
-            throw new customError('password is required',404)
-        }
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      phone,
+      gender,
+    });
 
-        const user = new User({
-            firstName,
-            lastName,
-            email,
-            // password,
-            phone,
-            gender
-        });
-            
-        const hashedPassword = await hashPassword(password)
-        user.password = hashedPassword
-        await user.save()
+    const hashedPassword = await hashPassword(password);
 
-        res.status(201).json({
-            message:'user registered successfully',
-            success: true,
-            status: 'success',
-            data: user
-        })
+    user.password = hashedPassword;
 
-  
-}
-)
+    await user.save();
 
+    res.status(201).json({
+      message: "user registered successfully!",
+      success: true,
+      status: "success",
+      data: user,
+    });
+  }
+);
 
-export const login =asyncHandler( async (req: Request, res: Response, next:NextFunction) => {
-    
-        const { email, password } = req.body;
-        if(!email){
-            throw new customError('email is required',400)
-        }
-        if(!password){
-            throw new customError('password is required',400)
-        }
+export const login = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body;
 
-        const user:any= await User.findOne({ email });
+    if (!email) {
+      throw new CustomError("email required", 400); //400
+    }
 
-        if (!user) {
-            throw new customError('credentials does not match ',400)
-            }
+    if (!password) {
+      throw new CustomError("password required", 400); //400
+    }
 
-        const {password:userPass,...userData} = user?._doc
-        const isPasswordMatch = await comparePassword(password,userPass)
+    const user: any = await User.findOne({ email });
 
-         if (!isPasswordMatch) {
-            throw new customError('credentials does not match ',400)
-            }
-        
-            // generate token
-        const payload:IPayload= {
-            _id:user._id,
-            email:user.email,
-            firstName:user.firstName,
-            lastName:user.lastName,
-            role: user.role
-        }
+    if (!user) {
+      throw new CustomError("credentials does not match", 400); //400
+    }
 
-        const token = generateToken(payload)
+    const { password: userPass, ...userData } = user?._doc;
 
-        // console.log(token)
-            
-        res.cookie('access_token',token,{
-            secure:process.env.NODE_ENV === 'development' ? false :true,
-            httpOnly:true,
-            maxAge:Number(process.env.COOKIE_EXPIRES_IN ?? '7') * 24 * 60 * 60 * 1000 
+    const isPasswordMatch = await comparePassword(password, userPass);
 
-        }).status(201).json({
-            message:'login successful',
-            status:"success",
-            success:true,
-            data:{
-                data:userData,
-                access_token:token
-            }
-        })
-}
-)
+    if (!isPasswordMatch) {
+      throw new CustomError("credentials does not match", 400); //400
+    }
 
+    const payload: IPayload = {
+      _id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    };
 
+    //! generate token
+    const token = generateToken(payload);
+
+    console.log(token);
+    res
+      .cookie("access_token", token, {
+        secure: process.env.NODE_ENV === "development" ? false : true,
+        httpOnly: true,
+        maxAge:
+          Number(process.env.COOKIE_EXPIRES_IN ?? "7") * 24 * 60 * 60 * 1000,
+        sameSite: "none",
+      })
+      .status(201)
+      .json({
+        message: "Login successful",
+        status: "success",
+        success: true,
+        data: {
+          data: userData,
+          access_token: token,
+        },
+      });
+  }
+);
 
 // !logout
-export const logout = asyncHandler((req:Request,res:Response) =>{
-  res.clearCookie('access_token',{
-            httpOnly:true,
-            sameSite:'none',
-            secure: process.env.NODE_ENV === "development" ? false : true,
+export const logout = asyncHandler((req: Request, res: Response) => {
+  res
+    .clearCookie("access_token", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: process.env.NODE_ENV === "development" ? false : true,
     })
     .status(200)
     .json({
-        message:'Logged out successfully',
-        success:true,
-        status:'success',
-        data:null
-    })
-})
+      message: "Logged out successfully",
+      success: true,
+      status: "success",
+      data: null,
+    });
+});
 
-// get profile
+
+
+//! get profile
 export const profile = asyncHandler(async(req:Request,res:Response)=>{
 
   const user_id = req.user._id;
@@ -121,7 +124,7 @@ export const profile = asyncHandler(async(req:Request,res:Response)=>{
   const user = await User.findById(user_id);
 
   if(!user){
-    throw new customError('profile not found',404)
+    throw new CustomError('profile not found',404)
   }
 
   res.status(200).json({

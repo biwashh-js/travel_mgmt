@@ -32,84 +32,88 @@ const jwt_utils_1 = require("../utils/jwt.utils");
 exports.register = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstName, lastName, email, password, phone, gender } = req.body;
     if (!password) {
-        throw new error_handler_middleware_1.default('password is required', 404);
+        throw new error_handler_middleware_1.default("password is required", 400);
     }
     const user = new user_models_1.default({
         firstName,
         lastName,
         email,
-        // password,
         phone,
-        gender
+        gender,
     });
     const hashedPassword = yield (0, bcrypt_utils_1.hashPassword)(password);
     user.password = hashedPassword;
     yield user.save();
     res.status(201).json({
-        message: 'user registered successfully',
+        message: "user registered successfully!",
         success: true,
-        status: 'success',
-        data: user
+        status: "success",
+        data: user,
     });
 }));
 exports.login = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { email, password } = req.body;
     if (!email) {
-        throw new error_handler_middleware_1.default('email is required', 400);
+        throw new error_handler_middleware_1.default("email required", 400); //400
     }
     if (!password) {
-        throw new error_handler_middleware_1.default('password is required', 400);
+        throw new error_handler_middleware_1.default("password required", 400); //400
     }
     const user = yield user_models_1.default.findOne({ email });
     if (!user) {
-        throw new error_handler_middleware_1.default('credentials does not match ', 400);
+        throw new error_handler_middleware_1.default("credentials does not match", 400); //400
     }
     const _b = user === null || user === void 0 ? void 0 : user._doc, { password: userPass } = _b, userData = __rest(_b, ["password"]);
     const isPasswordMatch = yield (0, bcrypt_utils_1.comparePassword)(password, userPass);
     if (!isPasswordMatch) {
-        throw new error_handler_middleware_1.default('credentials does not match ', 400);
+        throw new error_handler_middleware_1.default("credentials does not match", 400); //400
     }
-    // generate token
     const payload = {
         _id: user._id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
     };
+    //! generate token
     const token = (0, jwt_utils_1.generateToken)(payload);
-    // console.log(token)
-    res.cookie('access_token', token, {
-        secure: process.env.NODE_ENV === 'development' ? false : true,
+    console.log(token);
+    res
+        .cookie("access_token", token, {
+        secure: process.env.NODE_ENV === "development" ? false : true,
         httpOnly: true,
-        maxAge: Number((_a = process.env.COOKIE_EXPIRES_IN) !== null && _a !== void 0 ? _a : '7') * 24 * 60 * 60 * 1000
-    }).status(201).json({
-        message: 'login successful',
+        maxAge: Number((_a = process.env.COOKIE_EXPIRES_IN) !== null && _a !== void 0 ? _a : "7") * 24 * 60 * 60 * 1000,
+        sameSite: "none",
+    })
+        .status(201)
+        .json({
+        message: "Login successful",
         status: "success",
         success: true,
         data: {
             data: userData,
-            access_token: token
-        }
+            access_token: token,
+        },
     });
 }));
 // !logout
 exports.logout = (0, async_handler_utils_1.asyncHandler)((req, res) => {
-    res.clearCookie('access_token', {
+    res
+        .clearCookie("access_token", {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: "none",
         secure: process.env.NODE_ENV === "development" ? false : true,
     })
         .status(200)
         .json({
-        message: 'Logged out successfully',
+        message: "Logged out successfully",
         success: true,
-        status: 'success',
-        data: null
+        status: "success",
+        data: null,
     });
 });
-// get profile
+//! get profile
 exports.profile = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user_id = req.user._id;
     const user = yield user_models_1.default.findById(user_id);
