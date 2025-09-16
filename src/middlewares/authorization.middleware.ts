@@ -5,7 +5,7 @@ import User from "../models/user.models";
 import { IJwtPayload } from "../types/global.types";
 import { Role } from "../types/enum.types";
 
-export const authenticate = (roles:Role[])=>{
+export const authenticate = (roles?:Role[])=>{
     return async (req:Request,res:Response,next:NextFunction)=>{
         try{
             const token = req.cookies.access_token;
@@ -31,7 +31,7 @@ export const authenticate = (roles:Role[])=>{
                     httpOnly:true,
                     maxAge:Date.now(),
                     sameSite:'none',
-                     secure: process.env.NODE_ENV === "development" ? false : true,
+                    secure: process.env.NODE_ENV === "development" ? false : true,
                 })
                 throw new customError('Unathorized. Access Denied',401)
             }

@@ -22,11 +22,25 @@ const app = express()
 connectDatabase(DB_URI)
 
 
+const allowed_origins= [
+  "http://localhost:5173",
+   process.env.FRONT_END_URL,
+   "https://travel-mgmt.onrender.com"
 
+]
 //using middlewares
 app.use(
   cors({
-    origin: process.env.FRONT_END_URL || "http://localhost:5173",
+    origin: (origin,callback)=>{
+      if(!origin) callback(null,true)
+
+      if(!allowed_origins.includes(origin)){
+        callback(new customError("cors error, origin not expected",400))
+      } else{
+        callback(null,true)
+      }
+    },
+
     credentials: true,
   })
 );
