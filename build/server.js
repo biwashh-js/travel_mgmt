@@ -55,7 +55,10 @@ const app = (0, express_1.default)();
 //connect database
 (0, database_config_1.connectDatabase)(DB_URI);
 //using middlewares
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: process.env.FRONT_END_URL || "http://localhost:5173",
+    credentials: true,
+}));
 app.use((0, helmet_1.default)());
 app.use(express_1.default.urlencoded({ extended: true, limit: '5mb' }));
 app.use(express_1.default.json({ limit: '5mb' }));
