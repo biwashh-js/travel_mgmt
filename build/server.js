@@ -76,7 +76,7 @@ app.use('/api/auth', auth_routes_1.default);
 app.use('/api/user', user_routes_1.default);
 app.use('/api/tour_package', tour_package_routes_1.default);
 app.use('/api/booking', booking_routes_1.default);
-app.use("/api/admin/dashboard", adminDashboard_routes_1.default);
+app.use("/api/admin", adminDashboard_routes_1.default);
 // fallback routing
 app.all('{*spalt}', (req, res, next) => {
     const error = new error_handler_middleware_1.default(`cannot ${req.method} on ${req.originalUrl}`, 404);

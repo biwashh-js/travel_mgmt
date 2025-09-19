@@ -56,7 +56,7 @@ app.use('/api/auth',authRoutes)
 app.use('/api/user',userRoutes)
 app.use('/api/tour_package',packageRoutes)
 app.use('/api/booking',bookingRoutes)
-app.use("/api/admin/dashboard", dashboardRoutes);
+app.use("/api/admin", dashboardRoutes);
 
 // fallback routing
 app.all('{*spalt}',(req:Request, res:Response, next:NextFunction) => {

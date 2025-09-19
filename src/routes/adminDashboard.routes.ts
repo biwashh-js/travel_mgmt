@@ -4,6 +4,6 @@ import { getDashboardCounts } from "../controllers/dashboardController";
 
 const router = Router();
 
-router.get("/counts", getDashboardCounts);
+router.get("/", getDashboardCounts);
 
 export default router;
