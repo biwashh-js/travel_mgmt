@@ -49,6 +49,7 @@ const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const tour_package_routes_1 = __importDefault(require("./routes/tour_package.routes"));
 const booking_routes_1 = __importDefault(require("./routes/booking.routes"));
+const adminDashboard_routes_1 = __importDefault(require("./routes/adminDashboard.routes"));
 const PORT = process.env.PORT || 8080;
 const DB_URI = (_a = process.env.DB_URI) !== null && _a !== void 0 ? _a : '';
 const app = (0, express_1.default)();
@@ -89,6 +90,7 @@ app.use('/api/auth', auth_routes_1.default);
 app.use('/api/user', user_routes_1.default);
 app.use('/api/tour_package', tour_package_routes_1.default);
 app.use('/api/booking', booking_routes_1.default);
+app.use("/api/admin/dashboard", adminDashboard_routes_1.default);
 // fallback routing
 app.all('{*spalt}', (req, res, next) => {
     const error = new error_handler_middleware_1.default(`cannot ${req.method} on ${req.originalUrl}`, 404);
