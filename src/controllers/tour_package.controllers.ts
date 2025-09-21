@@ -142,7 +142,7 @@ const {packageId} = req.params
 
 export const deletePackage = asyncHandler(async(req:Request,res:Response,next:NextFunction) => {
     
-        const {cover_image,images} = req.files as {[fieldname:string]: Express.Multer.File[]}  
+         
         const {packageId} = req.params
     
         const tour_package = await Tour_Package.findById(packageId)

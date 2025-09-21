@@ -125,7 +125,6 @@ exports.getById = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __
 }));
 exports.deletePackage = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { cover_image, images } = req.files;
     const { packageId } = req.params;
     const tour_package = yield tour_package_model_1.default.findById(packageId);
     if (!tour_package) {
