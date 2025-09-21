@@ -19,7 +19,7 @@ const booking_model_1 = __importDefault(require("../models/booking.model"));
 const enum_types_1 = require("../types/enum.types");
 const getDashboardCounts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const usersCount = yield user_models_1.default.countDocuments({ role: enum_types_1.Role.USER });
+        const usersCount = yield user_models_1.default.countDocuments();
         const adminsCount = yield user_models_1.default.countDocuments({ role: enum_types_1.Role.ADMIN });
         const tourPackagesCount = yield tour_package_model_1.default.countDocuments();
         const bookingsCount = yield booking_model_1.default.countDocuments();

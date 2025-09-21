@@ -8,7 +8,7 @@ import { Role } from "../types/enum.types";
 
 export const getDashboardCounts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const usersCount = await User.countDocuments({ role: Role.USER});
+    const usersCount = await User.countDocuments();
     const adminsCount = await User.countDocuments({ role: Role.ADMIN });
     const tourPackagesCount = await Tour_Package.countDocuments();
     const bookingsCount = await Booking.countDocuments();
