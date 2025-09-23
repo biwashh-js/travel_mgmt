@@ -16,5 +16,5 @@ router.get('/:id', (0, authorization_middleware_1.authenticate)(global_types_1.a
 router.get('/package/:packageId', (0, authorization_middleware_1.authenticate)(global_types_1.allAdmins), booking_controller_1.getAllBookingsByTourPackage);
 router.get('/user', (0, authorization_middleware_1.authenticate)(global_types_1.onlyUser), booking_controller_1.getUserBooking);
 router.put('/:id', (0, authorization_middleware_1.authenticate)(global_types_1.onlyUser), booking_controller_1.update);
-router.delete('/:id', (0, authorization_middleware_1.authenticate)(global_types_1.onlyAdmin), booking_controller_1.update);
+router.delete('/:id', (0, authorization_middleware_1.authenticate)(global_types_1.onlyAdmin), booking_controller_1.remove);
 exports.default = router;
