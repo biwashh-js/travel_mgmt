@@ -303,6 +303,28 @@ export const update = asyncHandler(async(req:Request, res:Response, next:NextFun
 
 })
 
+//delete
+export const remove = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const {id} = req.params
+    const booking = await Booking.findById(id)
+    if(!booking){
+        throw new customError('booking not found',404)
+    }
+
+    const tour_package = await Tour_Package.findById(booking.tour_package)
+    if(tour_package){
+        tour_package.seats_available += Number(booking.total_person)
+        await tour_package.save()
+    }
+
+    await booking.deleteOne()
+
+    res.status(200).json({
+        message:'booking deleted',
+        status:'success',
+        success:true
+    })
+})
 
 
 

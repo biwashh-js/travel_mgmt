@@ -1,7 +1,7 @@
 import express from 'express'
 import { book,cancel,confirm,getAllBookings, getAllBookingsByTourPackage, getById, getUserBooking, update } from '../controllers/booking.controller'
 import { authenticate } from '../middlewares/authorization.middleware'
-import { allAdmins, allUserAndAdmins, onlyUser } from '../types/global.types'
+import { allAdmins, allUserAndAdmins, onlyAdmin, onlyUser } from '../types/global.types'
 
 
 
@@ -15,6 +15,7 @@ router.get('/:id',authenticate(allUserAndAdmins),getById)
 router.get('/package/:packageId',authenticate(allAdmins),getAllBookingsByTourPackage)
 router.get('/user',authenticate(onlyUser),getUserBooking)
 router.put('/:id',authenticate(onlyUser),update)
+router.delete('/:id',authenticate(onlyAdmin),update)
 
 
 export default router

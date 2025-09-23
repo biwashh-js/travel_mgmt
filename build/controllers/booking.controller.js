@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update = exports.confirm = exports.cancel = exports.getUserBooking = exports.getById = exports.getAllBookingsByTourPackage = exports.getAllBookings = exports.book = void 0;
+exports.remove = exports.update = exports.confirm = exports.cancel = exports.getUserBooking = exports.getById = exports.getAllBookingsByTourPackage = exports.getAllBookings = exports.book = void 0;
 const async_handler_utils_1 = require("../utils/async-handler.utils");
 const error_handler_middleware_1 = __importDefault(require("../middlewares/error-handler.middleware"));
 const tour_package_model_1 = __importDefault(require("../models/tour_package.model"));
@@ -262,6 +262,25 @@ exports.update = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __a
         status: 'success',
         success: true,
         data: booking
+    });
+}));
+//delete
+exports.remove = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const booking = yield booking_model_1.default.findById(id);
+    if (!booking) {
+        throw new error_handler_middleware_1.default('booking not found', 404);
+    }
+    const tour_package = yield tour_package_model_1.default.findById(booking.tour_package);
+    if (tour_package) {
+        tour_package.seats_available += Number(booking.total_person);
+        yield tour_package.save();
+    }
+    yield booking.deleteOne();
+    res.status(200).json({
+        message: 'booking deleted',
+        status: 'success',
+        success: true
     });
 }));
 // filter get bookings by user
